@@ -64,7 +64,7 @@ Because **LifeQuest** is 100% client-side, there are **no dependencies, build st
 
 ### 🌐 Option 1: Try the Live Demo (Instant)
 Experience the app directly in your browser without cloning:  
-👉 **[Launch LifeQuest Protocol](https://YOUR-USERNAME.github.io/YOUR-REPO-NAME/)**
+👉 **[Launch LifeQuest Protocol](https://my-lifequest.netlify.app/)**
 
 ---
 
