@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LifeQuest</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+    <link rel="shortcut icon" href="logo.png" type="image/png">
+</head>
+<body class="py-4">
+
+<!-- ========================================== -->
+<!-- ONBOARDING TUTORIAL OVERLAY           -->
+<!-- ========================================== -->
+<div id="tutorial-overlay" class="d-none" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 10, 0, 0.95); z-index: 9500; display: flex; flex-direction: column; justify-content: center; align-items: center; backdrop-filter: blur(8px);">
+    <div class="card border-success bg-black" style="max-width: 600px; width: 90%; box-shadow: 0 0 30px rgba(57, 255, 20, 0.2);">
+        <div class="card-header border-success text-success fw-bold text-uppercase" style="letter-spacing: 2px;">
+            <i class="bi bi-robot me-2"></i>> SYS_DAEMON: ONBOARDING_PROTOCOL
+        </div>
+        <div class="card-body p-4">
+            <pre id="tutorial-text" class="text-success fw-bold mb-4" style="font-family: 'Fira Code', monospace; white-space: pre-wrap; min-height: 160px; line-height: 1.6;"></pre>
+            <button class="btn btn-outline-success w-100 fw-bold d-none text-uppercase" id="btn-tutorial-next">> ACKNOWLEDGE</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========================================== -->
+<!-- RANK PROMOTION OVERLAY                -->
+<!-- ========================================== -->
+<div id="promotion-overlay" class="d-none">
+    <div class="promo-content text-center">
+        <h6 class="text-light fw-bold text-uppercase mb-4" style="letter-spacing: 5px; opacity: 0.7;">
+            > SYSTEM_OVERRIDE: PROMOTION_INITIATED <
+        </h6>
+        <i id="promo-icon" class="bi"></i>
+        <h1 id="promo-rank" class="fw-bold text-uppercase mt-2 mb-4">RANK_NAME</h1>
+        <p class="text-light small fw-bold text-uppercase" style="letter-spacing: 2px;">CALIBRATING_NEW_PARAMETERS...</p>
+        <button class="btn btn-outline-light fw-bold mt-4 px-5 py-2" onclick="closePromotion()">> ACKNOWLEDGE</button>
+    </div>
+</div>
+
+<!-- ========================================== -->
+<!-- SYSTEM BOOT SEQUENCE OVERLAY          -->
+<!-- ========================================== -->
+<div id="boot-screen" class="boot-overlay">
+    <div id="boot-text" class="boot-text"></div>
+</div>
+
+<div class="container" style="max-width: 1050px;">
+    
+    <div class="mb-3">
+        <span class="terminal-prompt">root@system:~#</span> ./launch_gamified_tracker.sh
+    </div>
+
+    <nav class="nav nav-pills gap-2 p-1 mb-4 border border-success" role="tablist">
+        <button class="nav-link active fw-bold text-uppercase" data-target="dashboard" type="button">[ DAILY_DASHBOARD ]</button>
+        <button class="nav-link fw-bold text-uppercase" data-target="ladder" type="button">[ RANK_LADDER ]</button> <button class="nav-link fw-bold text-uppercase" data-target="calendar" type="button">[ STREAK_CALENDAR ]</button>
+        <button class="nav-link fw-bold text-uppercase" data-target="trophies" type="button">[ TROPHY_ROOM ]</button>
+        <button class="nav-link fw-bold text-uppercase" data-target="upgrades" type="button">[ BLACK_MARKET ]</button>
+        <button class="nav-link fw-bold text-uppercase" data-target="operations" type="button">[ BLACK_ICE_OPS ]</button>
+        <button class="nav-link fw-bold text-uppercase" data-target="settings" type="button">[ SYSTEM_SETTINGS ]</button>
+    </nav>
+
+    <section id="dashboard" class="active-section">
+        <div id="overclock-banner" class="d-none alert border-success rounded-0 text-center fw-bold mb-4 overclock-banner">
+            <i class="bi bi-lightning-charge-fill me-2"></i> SYSTEM OVERCLOCKED: 1.2X XP MULTIPLIER ACTIVE <i class="bi bi-lightning-charge-fill ms-2"></i>
+        </div>
+        <div id="chrono-banner" class="alert border-warning rounded-0 text-center fw-bold mb-4" style="background-color: rgba(255, 193, 7, 0.05); color: #ffc107;">
+            <i class="bi bi-hourglass-split me-2"></i> CHRONO_DECAY: <span id="chrono-status">OPTIMAL_PHASE [1.0X YIELD]</span>
+        </div>
+        
+        <!-- 2. Level & XP -->
+        <div class="card mb-4 border-success">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center fw-bold mb-2">
+                    <div>
+                        <span id="level-display" class="me-2">LVL_01</span>
+                        <span id="rank-display" class="badge bg-transparent border border-secondary text-secondary" style="font-size: 0.75rem; letter-spacing: 1px;">
+                            <i class="bi bi-nut-fill me-1"></i>IRON
+                        </span>
+                    </div>
+                    <span id="xp-display">000 / 500 XP</span>
+                </div>
+                <div class="progress rounded-0 border border-success bg-black" style="height: 25px;">
+                    <div id="xp-bar-fill" class="progress-bar bg-success" role="progressbar" style="width: 0%;"></div>
+                </div>
+                <!-- NEW: RANK PROGRESS TRACKER -->
+                <div id="rank-progress-container" class="mt-2 text-end fw-bold text-uppercase" style="font-size: 0.65rem; letter-spacing: 1px;">
+                    <!-- Injected via JS -->
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-4 border-danger" id="threat-container" style="background-color: rgba(255, 0, 60, 0.05);">
+            <div class="card-body py-3">
+                <div class="d-flex justify-content-between fw-bold mb-1 text-danger">
+                    <span><i class="bi bi-shield-slash-fill me-2"></i>SYSTEM_THREAT_LEVEL</span>
+                    <span id="threat-display">0%</span>
+                </div>
+                <div class="progress rounded-0 border border-danger bg-black mb-2" style="height: 10px;">
+                    <div id="threat-bar-fill" class="progress-bar bg-danger" role="progressbar" style="width: 0%;"></div>
+                </div>
+                <button class="btn btn-outline-danger btn-sm w-100 fw-bold text-uppercase mt-2" id="btn-antivirus" onclick="runAntivirus()">
+                    > INJECT_ANTIVIRUS (-200 XP)
+                </button>
+            </div>
+        </div>
+
+        <div class="card mb-4 border-success">
+            <div class="card-header border-success fw-bold text-uppercase">
+                <i class="bi bi-terminal me-2"></i> > EXECUTE_TODAYS_OBJECTIVES
+            </div>
+            <div class="card-body">
+                <div class="row g-3 align-items-start" id="objectives-container">
+                    <!-- Tasks injected via JS -->
+                </div>
+            </div>
+
+        <div class="card mb-4 border-success daemon-card" id="daemon-container">
+            <div class="card-header border-success fw-bold text-uppercase d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-robot me-2"></i> > SYS_DAEMON_LINK</span>
+                <span id="daemon-status" class="badge bg-success text-black">ONLINE</span>
+            </div>
+            <div class="card-body d-flex align-items-center">
+                <pre id="daemon-ascii" class="mb-0 me-4 fw-bold" style="font-size: 14px; line-height: 1.2; font-family: monospace;"></pre>
+                <div class="border-start border-success ps-4 w-100" id="daemon-border">
+                    <p class="mb-1 fw-bold text-uppercase">> DIAGNOSTIC_OUTPUT:</p>
+                    <p id="daemon-dialogue" class="small mb-0 text-muted typing-effect"></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-4 border-success">
+            <div class="card-header border-success fw-bold text-uppercase">
+                <i class="bi bi-radar me-2"></i> > CHARACTER_STAT_RADAR
+            </div>
+            <div class="card-body">
+                <div style="height: 250px; width: 100%; position: relative;">
+                    <canvas id="statRadarCanvas"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-4 border-success">
+            <div class="card-body text-center">
+                <h5 id="heatmap-title" class="mb-3 fw-bold text-uppercase"><i class="bi bi-grid-3x3 me-2"></i>> RENDER_MONTHLY_HEATMAP</h5>
+                <div class="d-flex justify-content-center">
+                    <div class="heatmap-grid" id="heatmap-container">
+                        </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="ladder" class="d-none">
+        <div class="card border-success mb-4">
+            <div class="card-header border-success fw-bold text-uppercase d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-bar-chart-steps me-2"></i>> COMPETITIVE_LADDER</span>
+                <span id="ladder-total-xp" class="badge bg-dark border border-success text-success">LIFETIME: 0 XP</span>
+            </div>
+            <div class="card-body">
+                <p class="text-muted small mb-4">> COMPLETE_OBJECTIVES_TO_ASCEND_THE_HIERARCHY.</p>
+                <div class="d-flex flex-column gap-3" id="ladder-container">
+                    </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="calendar" class="d-none">
+        <div class="card border-success">
+            <div class="card-body">
+                <div class="d-flex justify-content-center align-items-center gap-4 mb-4">
+                    <button class="btn btn-outline-success" id="prev-month"><i class="bi bi-chevron-left"></i></button>
+                    <h3 id="calendar-title" class="fw-bold m-0" style="min-width: 250px; text-align: center;">MAY 2026</h3>
+                    <button class="btn btn-outline-success" id="next-month"><i class="bi bi-chevron-right"></i></button>
+                </div>
+                <div class="calendar-grid" id="calendar-grid">
+                    </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="trophies" class="d-none">
+        <div class="card bg-transparent border-0 mb-4">
+            <div class="card-body p-0">
+                <button class="btn btn-outline-success w-100 fw-bold mb-4 py-3" onclick="generateSprintDebrief()">
+                    <i class="bi bi-bar-chart-line-fill me-2"></i>> GENERATE_SPRINT_RETROSPECTIVE (7-DAY DEBRIEF)
+                </button>
+                <div class="row g-4 justify-content-center" id="trophy-container">
+                    </div>
+            </div>
+        </div>
+    </section>
+
+<section id="upgrades" class="d-none">
+        <div class="card border-success mb-4">
+            <div class="card-header border-success fw-bold text-uppercase d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-cart-dash me-2"></i>> SYS_UPGRADE_STORE (THEMES)</span>
+                <span id="market-xp-display" class="badge bg-dark border border-success text-success">AVAILABLE: 0 XP</span>
+            </div>
+            <div class="card-body">
+                <p class="text-muted small mb-4">> EXPEND_XP_TO_OVERRIDE_ROOT_COLORSCHEME.</p>
+                <div class="row g-4" id="store-container">
+                    </div>
+            </div>
+        </div>
+
+        <div class="card border-purple mb-4 cyberware-container">
+            <div class="card-header border-purple text-purple fw-bold text-uppercase d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-cpu-fill me-2"></i>> SYS_CYBERWARE (PASSIVE_BUFFS)</span>
+            </div>
+            <div class="card-body">
+                <p class="text-purple small mb-4">> INSTALL_HARDWARE_FOR_PERMANENT_+20%_XP_YIELD_ON_SPECIFIC_ATTRIBUTES.</p>
+                <div class="row g-4" id="cyberware-container">
+                    </div>
+            </div>
+        </div>
+
+        <div class="card border-orange mb-4 consumable-container">
+            <div class="card-header border-orange text-orange fw-bold text-uppercase d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-box-seam me-2"></i>> SYS_CONSUMABLES (SINGLE_USE)</span>
+                <span id="inventory-display" class="badge bg-orange text-dark">SCRAPERS: 0 | STASIS: OFFLINE</span>
+            </div>
+            <div class="card-body">
+                <p class="text-muted small mb-4">> DEPLOY_UTILITIES_TO_MANIPULATE_SYSTEM_PARAMETERS.</p>
+                <div class="row g-4" id="consumables-container">
+                    </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="settings" class="d-none">
+        
+        <!-- NEW: PERMANENT CODEX MANUAL -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <button class="btn btn-outline-info w-100 fw-bold py-3 text-uppercase" style="letter-spacing: 2px;" onclick="openBeginnersManual()">
+                    <i class="bi bi-journal-code me-2"></i>> DECRYPT LIFEQUEST_MASTER_PROTOCOL (USER_MANUAL)
+                </button>
+            </div>
+        </div>
+
+        <!-- ROW 1: DATABASE TABLE -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-success">
+                    <div class="card-body p-0 table-responsive" style="max-height: 250px; overflow-y: auto;">
+                        <table class="table table-dark table-hover m-0 border-success">
+                            <thead class="table-active" style="position: sticky; top: 0; z-index: 1;">
+                                <tr>
+                                    <th class="p-3">TASK_ID_NAME</th>
+                                    <th class="p-3 text-end">XP_REWARD</th>
+                                </tr>
+                            </thead>
+                            <tbody id="task-table-body">
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ROW 2: CONFIGURE DATA (3-COLUMN WIDE LAYOUT) -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-success">
+                    <div class="card-header border-success fw-bold text-uppercase">
+                        > CONFIGURE_DATA
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-4">
+                            <!-- Column 1: Core Stats -->
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold text-uppercase">--TASK-NAME</label>
+                                    <input type="text" class="form-control" id="input-task-name" placeholder="Input string...">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold text-uppercase">--ATTRIBUTE_CLASS</label>
+                                    <select class="form-control bg-dark text-success border-success rounded-0" id="input-attribute" style="cursor: crosshair;">
+                                        <option value="STR">[STR] STRENGTH</option>
+                                        <option value="INT">[INT] INTELLIGENCE</option>
+                                        <option value="DIS">[DIS] DISCIPLINE</option>
+                                        <option value="CHR">[CHR] CHARISMA</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="form-label small fw-bold text-uppercase">--XP-REWARD</label>
+                                    <input type="number" class="form-control" id="input-xp-reward" placeholder="Input integer...">
+                                </div>
+                            </div>
+                            
+                            <!-- Column 2: Scheduling & Subtasks -->
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold text-uppercase">--ACTIVE_DAYS</label>
+                                    <div class="d-flex flex-wrap gap-2" id="input-days">
+                                        <div class="form-check form-check-inline m-0"><input class="form-check-input day-cb" type="checkbox" value="0" checked><label class="form-check-label small ms-1">SUN</label></div>
+                                        <div class="form-check form-check-inline m-0"><input class="form-check-input day-cb" type="checkbox" value="1" checked><label class="form-check-label small ms-1">MON</label></div>
+                                        <div class="form-check form-check-inline m-0"><input class="form-check-input day-cb" type="checkbox" value="2" checked><label class="form-check-label small ms-1">TUE</label></div>
+                                        <div class="form-check form-check-inline m-0"><input class="form-check-input day-cb" type="checkbox" value="3" checked><label class="form-check-label small ms-1">WED</label></div>
+                                        <div class="form-check form-check-inline m-0"><input class="form-check-input day-cb" type="checkbox" value="4" checked><label class="form-check-label small ms-1">THU</label></div>
+                                        <div class="form-check form-check-inline m-0"><input class="form-check-input day-cb" type="checkbox" value="5" checked><label class="form-check-label small ms-1">FRI</label></div>
+                                        <div class="form-check form-check-inline m-0"><input class="form-check-input day-cb" type="checkbox" value="6" checked><label class="form-check-label small ms-1">SAT</label></div>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold text-uppercase">--SUB_TASKS (OPTIONAL)</label>
+                                    <input type="text" class="form-control" id="input-subtasks" placeholder="Comma separated (e.g. Squats, Pushups)">
+                                </div>
+                                <div>
+                                    <label class="form-label small fw-bold text-uppercase text-danger">--STRICT_DEADLINE (OPTIONAL)</label>
+                                    <input type="time" class="form-control border-danger text-danger bg-transparent" id="input-deadline">
+                                </div>
+                            </div>
+                            
+                            <!-- Column 3: Documentation & Actions -->
+                            <div class="col-md-4 d-flex flex-column">
+                                <div class="mb-3 flex-grow-1 d-flex flex-column">
+                                    <label class="form-label small fw-bold text-uppercase text-info">--SOP_MANUAL (OPTIONAL)</label>
+                                    <textarea class="form-control border-info text-info bg-transparent flex-grow-1" id="input-manual" placeholder="> Enter standard operating procedures..."></textarea>
+                                </div>
+                                <div class="d-flex gap-2 mt-auto">
+                                    <button class="btn btn-success w-100 fw-bold" id="btn-add-task">INSERT INTO DB</button>
+                                    <button class="btn btn-outline-success w-100 fw-bold" id="btn-delete-task">DROP SELECTED</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ROW 3: UTILITIES -->
+        <div class="row g-4 align-items-start">
+            <div class="col-md-5">
+                <div class="card border-danger">
+                    <div class="card-header border-danger fw-bold text-uppercase text-danger">
+                        > DEPLOY_NEW_OPERATION
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold text-uppercase text-danger">--OP_NAME</label>
+                            <input type="text" class="form-control border-danger text-danger bg-transparent" id="input-boss-name" placeholder="e.g. OP: KYUSIYUSPHERE">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold text-uppercase text-danger">--TARGET_DESC</label>
+                            <input type="text" class="form-control border-danger text-danger bg-transparent" id="input-boss-desc" placeholder="e.g. TARGET: DEPLOY LOCATOR SYSTEM">
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label small fw-bold text-uppercase text-danger">--MAX_HP (DIFFICULTY)</label>
+                            <input type="number" class="form-control border-danger text-danger bg-transparent" id="input-boss-hp" placeholder="e.g. 1500">
+                        </div>
+                        <button class="btn btn-outline-danger w-100 fw-bold" id="btn-update-boss">> INITIALIZE_OPERATION</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+    <div class="card border-info">
+        <div class="card-header border-info fw-bold text-uppercase text-info">
+            > TELEMETRY_BACKUP
+        </div>
+        <div class="card-body">
+            
+            <p class="text-info small mb-3">> EXPORT_STATE_TO_LOCAL_STORAGE OR DECRYPT_EXTERNAL_PAYLOAD.</p>
+            
+            <button class="btn btn-outline-info w-100 fw-bold mb-2" onclick="exportTelemetry()">
+                <i class="bi bi-download me-2"></i>> EXPORT_JSON_PAYLOAD
+            </button>
+            
+            <input type="file" id="file-import-input" accept=".json" class="d-none">
+            <button class="btn btn-outline-info w-100 fw-bold" id="btn-import-telemetry">
+                <i class="bi bi-upload me-2"></i>> IMPORT_SYSTEM_STATE
+            </button>
+
+            <div class="mt-4 pt-3 border-top border-info" style="border-top-style: dashed !important; opacity: 0.8;">
+                <h6 class="text-info fw-bold mb-3">> LOCAL_DISK_ACCESS</h6>
+                            <button onclick="saveToDisk()" class="btn btn-outline-info fw-bold w-100 text-uppercase mb-2">
+                                <i class="bi bi-device-hdd me-2"></i>> SAVE
+                            </button>
+                            
+                            <button onclick="loadFromDisk()" class="btn btn-outline-warning fw-bold w-100 text-uppercase">
+                                <i class="bi bi-folder-symlink me-2"></i>> LOAD
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card bg-transparent text-center p-3" style="border: 1px dashed #ff003c !important;">
+                    <h6 class="text-danger fw-bold text-uppercase mb-2"><i class="bi bi-exclamation-triangle-fill me-2"></i>SUDO_RM_-RF</h6>
+                    <p class="text-danger small mb-3" style="font-size: 0.75rem; opacity: 0.8;">WARNING: THIS WILL PERMANENTLY PURGE ALL XP, THEMES, AND EXECUTION LOGS.</p>
+                    <button class="btn btn-outline-danger btn-sm fw-bold w-100" id="btn-hard-reset">> EXECUTE_PURGE</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="operations" class="d-none">
+        <div class="row g-4" id="operations-container">
+            <!-- Operations injected via JS -->
+        </div>
+    </section>
+
+    <div class="modal fade" id="executionLogModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-black rounded-0 border border-success">
+                <div class="modal-header border-success">
+                    <h5 class="modal-title fw-bold text-uppercase"><i class="bi bi-terminal-dash me-2"></i>> SYSTEM_LOGS</h5>
+                    <button type="button" class="custom-close-btn" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <pre id="execution-log-output" class="text-success small mb-0" style="white-space: pre-wrap; font-family: 'Fira Code', monospace;"></pre>
+                </div>
+                <div class="modal-footer border-success d-flex justify-content-between">
+                    <button type="button" class="btn btn-outline-info fw-bold d-none" id="btn-repair-streak">> OVERRIDE_STREAK</button>
+                    <button type="button" class="btn btn-outline-success fw-bold" data-bs-dismiss="modal">CLOSE_CONNECTION</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="debriefModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content bg-black rounded-0 border border-success">
+                <div class="modal-header border-success">
+                    <h5 class="modal-title fw-bold text-uppercase"><i class="bi bi-pie-chart-fill me-2"></i>> SPRINT_RETROSPECTIVE</h5>
+                    <button type="button" class="custom-close-btn" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="row text-center mb-5 mt-2">
+                        <div class="col-4">
+                            <h6 class="text-muted small">> CYCLE_XP</h6>
+                            <h3 class="text-success fw-bold flash-text" id="debrief-xp">0</h3>
+                        </div>
+                        <div class="col-4 border-start border-end border-success">
+                            <h6 class="text-muted small">> DOMINANT_NODE</h6>
+                            <h3 class="text-info fw-bold" id="debrief-stat">N/A</h3>
+                        </div>
+                        <div class="col-4">
+                            <h6 class="text-muted small">> COMPLETION_RATE</h6>
+                            <h3 class="text-warning fw-bold" id="debrief-rate">0%</h3>
+                        </div>
+                    </div>
+                    <div class="border border-success p-3">
+                        <h6 class="text-success small fw-bold mb-3">> EXECUTION_GRAPH (LAST 7 DAYS)</h6>
+                        <div class="d-flex align-items-end justify-content-between gap-1" style="height: 150px;" id="debrief-graph">
+                            </div>
+                        <div class="d-flex justify-content-between mt-2 text-muted fw-bold" id="debrief-labels" style="font-size: 11px;">
+                            </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="sysModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content bg-black rounded-0" id="sysModalContent">
+                <div class="modal-body text-center p-4">
+                    <div id="sysModalIcon" class="display-4 mb-3"></div>
+                    <p id="sysModalMessage" class="fw-bold mb-4" style="font-family: 'Fira Code', monospace; white-space: pre-line;"></p>
+                    <div class="d-flex justify-content-center gap-3" id="sysModalButtons">
+                        </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div> 
+    
+    <div class="modal fade" id="codexModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content bg-black rounded-0 border border-info">
+                <div class="modal-header border-info">
+                    <h5 class="modal-title fw-bold text-uppercase text-info">
+                        <i class="bi bi-journal-code me-2"></i>> ENCRYPTED_CODEX_LINK
+                    </h5>
+                    <button type="button" class="custom-close-btn" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <h4 id="codex-title" class="fw-bold text-info text-uppercase mb-4"></h4>
+                    <div id="codex-content" class="text-light" style="font-family: 'Fira Code', monospace; white-space: pre-wrap; font-size: 0.95rem; line-height: 1.6;">
+                        </div>
+                </div>
+                <div class="modal-footer border-info">
+                    <button type="button" class="btn btn-outline-info fw-bold w-100" data-bs-dismiss="modal">> ACKNOWLEDGE_PROTOCOL</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="script.js"></script>
+</body>
+</html>

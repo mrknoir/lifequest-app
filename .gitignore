@@ -1,0 +1,14 @@
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Editor settings
+.vscode/
+.idea/
+
+# Dependency folders (if using npm/node in the future)
+node_modules/
+
+# Local environment variables
+.env
+*.log
