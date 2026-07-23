@@ -60,4 +60,18 @@ $$LVL = \left\lfloor \sqrt{\frac{XP}{500}} \right\rfloor + 1$$
 
 ## 🚀 Quick Start
 
-Because LifeQuest runs entirely client-side, running it locally requires **no installation** or `npm install`.
+Because **LifeQuest** is 100% client-side, there are **no dependencies, build steps, or `npm install` required**.
+
+### 🌐 Option 1: Try the Live Demo (Instant)
+Experience the app directly in your browser without cloning:  
+👉 **[Launch LifeQuest Protocol](https://YOUR-USERNAME.github.io/YOUR-REPO-NAME/)**
+
+---
+
+### 💻 Option 2: Run Locally (2 Steps)
+
+1. **Clone the repository:**
+   ```bash
+   git clone [https://github.com/YOUR-USERNAME/YOUR-REPO-NAME.git](https://github.com/YOUR-USERNAME/YOUR-REPO-NAME.git)
+   cd YOUR-REPO-NAME
+   
