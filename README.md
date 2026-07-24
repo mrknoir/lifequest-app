@@ -68,10 +68,11 @@ Experience the app directly in your browser without cloning:
 
 ---
 
-### 💻 Option 2: Run Locally (2 Steps)
+### 💻 Option 2: Run Locally
 
 1. **Clone the repository:**
    ```bash
    git clone [https://github.com/YOUR-USERNAME/YOUR-REPO-NAME.git](https://github.com/YOUR-USERNAME/YOUR-REPO-NAME.git)
    cd YOUR-REPO-NAME
-   
+    ```
+   - Open index.html directly in any modern web browser.
