@@ -3,7 +3,7 @@
 > Turn your daily routines into a high-stakes cyberpunk RPG. Level up your stats, stay accountable with dynamic streak mechanics, and track your personal growth—100% offline, privacy-first, and built with pure Vanilla JS.
 
 > [!NOTE]
-> **Educational & Vibecoded Project **  
+> Educational & Vibecoded Project  
 > This is my first **vibecoded** application, created for educational purposes as a sandbox to explore client-side Web APIs (Web Audio API, LocalStorage, DOM state sync) and dynamic RPG math mechanics in active collaboration with AI tools.
 
 ---
@@ -18,22 +18,22 @@ Built completely on client-side web standards, LifeQuest requires zero backend i
 
 ## Key Features
 
-* ** Procedural Web Audio Engine:**
+* Procedural Web Audio Engine:
   * Uses the browser's native `AudioContext` and dynamic oscillators (`square`, `sawtooth`, `sine`) to procedurally synthesize sound effects (level ups, item shatters, ambient throbs) on the fly without downloading external audio assets.
 
-* ** RPG Leveling & Cyberware Buffs:**
+* RPG Leveling & Cyberware Buffs:
   * Uses a dynamic mathematical scaling curve to calculate progression across primary attributes (Strength, Intelligence, Discipline, Charisma) with unlockable passive yields.
 
-* ** Threat Level & Chrono Decay:**
+* Threat Level & Chrono Decay:
   * High-stakes accountability mechanics featuring real-time streak multipliers, time-of-day penalty decay, and emergency system lockdowns.
 
-* ** SOP Codex & Black Ice Operations:**
+* SOP Codex & Black Ice Operations:
   * Structured operational manuals for habit loops, actionable task queues, and routine overclocking.
 
-* ** Visual Telemetry Analytics:**
+* Visual Telemetry Analytics:
   * Interactive skill distribution radar charts and completion history rendering directly on HTML5 `<canvas>` elements powered by **Chart.js**.
 
-* ** Local-First & Privacy Preserving:**
+* Local-First & Privacy Preserving:
   * All state transitions and inventory items persist securely in the browser's `localStorage`—no user data ever leaves your device.
 
 ---
